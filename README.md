@@ -48,48 +48,50 @@ The project integrates a debugger (accessible via the Debugger struct) which all
 - Inspect CPU registers and memory.
 - Monitor the state of the program counter and flags.
 
-## Current op code implementations:
-[✓] ADC
-[✓] AND
-[✓] BCC
-[✓] BCS
-[✓] BEQ
-[✓] BIT
-[✓] BMI
-[✓] BNE
-[✓] BPL
-[✓] BVC
-[✓] BVS
-[✓] CLC
-[✓] CLD
-[✓] CLI
-[✓] CLY
-[✓] CMP
-[✓] CPX
-[✓] CPY
-[✓] EOR
-[✓] JMP
-[✓] JSR
-[✓] LDA
-[✓] LDX
-[✓] LDY
-[✓] ORA
-[✓] PHA
-[✓] PHP
-[✓] PLA
-[✓] PLP
-[✓] RTI
-[✓] RTS
-[✓] SBC
-[✓] STA
-[✓] STX
-[✓] STY
-[✓] TAX
-[✓] TAY
-[✓] TSX
-[✓] TXA
-[✓] TXS
-[✓] TYA
+## 6502 Opcode Checklist
+
+[✓] ADC  
+[✓] AND  
+[✓] BCC  
+[✓] BCS  
+[✓] BEQ  
+[✓] BIT  
+[✓] BMI  
+[✓] BNE  
+[✓] BPL  
+[✓] BVC  
+[✓] BVS  
+[✓] CLC  
+[✓] CLD  
+[✓] CLI  
+[✓] CLY  
+[✓] CMP  
+[✓] CPX  
+[✓] CPY  
+[✓] EOR  
+[✓] JMP  
+[✓] JSR  
+[✓] LDA  
+[✓] LDX  
+[✓] LDY  
+[✓] ORA  
+[✓] PHA  
+[✓] PHP  
+[✓] PLA  
+[✓] PLP  
+[✓] RTI  
+[✓] RTS  
+[✓] SBC  
+[✓] STA  
+[✓] STX  
+[✓] STY  
+[✓] TAX  
+[✓] TAY  
+[✓] TSX  
+[✓] TXA  
+[✓] TXS  
+[✓] TYA  
+
 
 ## Contributing:
 Contributions are welcome! If you have suggestions, find bugs, or want to add new features:
