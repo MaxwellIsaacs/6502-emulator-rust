@@ -1,11 +1,10 @@
-====================
-6502 Emulator in Rust
-====================
+
+6502 emulator in rust
 
 # Description:
 This project is a 6502 microprocessor emulator written in Rust. The emulator replicates the behavior of the classic MOS Technology 6502 CPU—the heart of vintage computers and gaming consoles such as the Apple II, Commodore 64, and the Nintendo Entertainment System. It comes with an assembler to convert 6502 assembly language into machine code and includes a debugger interface to facilitate testing and development.
 
-Features:
+# Features:
 - CPU Emulation:
   Emulates key 6502 registers and flags (A, X, Y, SP, PC, and the status flags) and supports a broad range of 6502 instructions.
 - Opcode Handling:
@@ -49,6 +48,49 @@ The project integrates a debugger (accessible via the Debugger struct) which all
 - Inspect CPU registers and memory.
 - Monitor the state of the program counter and flags.
 
+# Current op code implementations:
+[✓] ADC
+[✓] AND
+[✓] BCC
+[✓] BCS
+[✓] BEQ
+[✓] BIT
+[✓] BMI
+[✓] BNE
+[✓] BPL
+[✓] BVC
+[✓] BVS
+[✓] CLC
+[✓] CLD
+[✓] CLI
+[✓] CLY
+[✓] CMP
+[✓] CPX
+[✓] CPY
+[✓] EOR
+[✓] JMP
+[✓] JSR
+[✓] LDA
+[✓] LDX
+[✓] LDY
+[✓] ORA
+[✓] PHA
+[✓] PHP
+[✓] PLA
+[✓] PLP
+[✓] RTI
+[✓] RTS
+[✓] SBC
+[✓] STA
+[✓] STX
+[✓] STY
+[✓] TAX
+[✓] TAY
+[✓] TSX
+[✓] TXA
+[✓] TXS
+[✓] TYA
+
 # Contributing:
 Contributions are welcome! If you have suggestions, find bugs, or want to add new features:
 - Please open an issue to discuss your ideas.
@@ -57,7 +99,3 @@ Contributions are welcome! If you have suggestions, find bugs, or want to add ne
 License:
 This project is licensed under the MIT License. See the LICENSE file for further details.
 
-Note:
-This README covers the core functionality and structure of the project—the “meat and bones.” Additional modules and features may be available in the repository.
-
-Happy coding, and enjoy exploring the world of 6502 emulation in Rust!
