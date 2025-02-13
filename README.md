@@ -1,10 +1,10 @@
 
-6502 emulator in rust
+# 6502 emulator in rust
 
-# Description:
+## Description:
 This project is a 6502 microprocessor emulator written in Rust. The emulator replicates the behavior of the classic MOS Technology 6502 CPU—the heart of vintage computers and gaming consoles such as the Apple II, Commodore 64, and the Nintendo Entertainment System. It comes with an assembler to convert 6502 assembly language into machine code and includes a debugger interface to facilitate testing and development.
 
-# Features:
+## Features:
 - CPU Emulation:
   Emulates key 6502 registers and flags (A, X, Y, SP, PC, and the status flags) and supports a broad range of 6502 instructions.
 - Opcode Handling:
@@ -19,7 +19,7 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
   The modular design makes it easy to add more instructions or enhance existing functionality.
 
   
-# Getting Started:
+## Getting Started:
 1. Clone the Repository:
    git clone https://github.com/MaxwellIsaacs/6502-emulator-rust.git
    cd 6502-emulator-rust
@@ -30,7 +30,7 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
 3. Running the Emulator:
    To run the emulator with a binary program, either paste your file into example.asm, or change the path in the `main.rs` file
 
-# Implementation Overview:
+## Implementation Overview:
 - CPU and Opcode Table:
   The CPU struct holds registers (a, x, y, sp, pc, and status) and a Debugger instance. It provides methods to execute instructions, set and clear flags, and update the program counter.
   An OpcodeTable maps opcodes (like LDA, STA, TAX, etc.) to their corresponding handler functions. The handlers are implemented as functions that may or may not require access to memory.
@@ -42,13 +42,13 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
   The assembler reads .asm files, removes comments, tokenizes instructions and operands, and uses a lookup table to convert assembly instructions into their corresponding opcode bytes.
   It supports various operand sizes (1 or 2 bytes) and handles little-endian conversion for 16-bit values.
 
-# Debugging and Testing:
+## Debugging and Testing:
 The project integrates a debugger (accessible via the Debugger struct) which allows you to:
 - Step through instruction execution.
 - Inspect CPU registers and memory.
 - Monitor the state of the program counter and flags.
 
-# Current op code implementations:
+## Current op code implementations:
 [✓] ADC
 [✓] AND
 [✓] BCC
@@ -91,7 +91,7 @@ The project integrates a debugger (accessible via the Debugger struct) which all
 [✓] TXS
 [✓] TYA
 
-# Contributing:
+## Contributing:
 Contributions are welcome! If you have suggestions, find bugs, or want to add new features:
 - Please open an issue to discuss your ideas.
 - Feel free to submit a pull request with your improvements.
