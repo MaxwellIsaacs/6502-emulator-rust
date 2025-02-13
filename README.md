@@ -98,6 +98,6 @@ Contributions are welcome! If you have suggestions, find bugs, or want to add ne
 - Please open an issue to discuss your ideas.
 - Feel free to submit a pull request with your improvements.
 
-License:
+## License:
 This project is licensed under the MIT License. See the LICENSE file for further details.
 
