@@ -2,13 +2,13 @@
 # 6502 emulator in rust
 
 ## Description:
-This project is a 6502 microprocessor emulator written in Rust. The emulator replicates the behavior of the classic MOS Technology 6502 CPU—the heart of vintage computers and gaming consoles such as the Apple II, Commodore 64, and the Nintendo Entertainment System. It comes with an assembler to convert 6502 assembly language into machine code and includes a debugger interface to facilitate testing and development.
+This project is a 6502 microprocessor emulator written in Rust. The emulator replicates the behavior of the classic MOS Technology 6502 CPU—the chip powering vintage computers and gaming consoles such as the Apple II, Commodore 64, and the Nintendo Entertainment System. It comes with an assembler to convert 6502 assembly language into machine code and includes a debugger interface to facilitate testing and development.
 
 ## Features:
 - CPU Emulation:
-  Emulates key 6502 registers and flags (A, X, Y, SP, PC, and the status flags) and supports a broad range of 6502 instructions.
+  Emulates key 6502 registers and flags (A, X, Y, SP, PC, and the status flags) and supports a small range of 6502 instructions.
 - Opcode Handling:
-  Implements a comprehensive opcode table with support for various addressing modes (Immediate, Zero Page, Absolute, etc.) and opcode handlers for each instruction.
+  Implements an opcode table with support for various addressing modes (Immediate, Zero Page, Absolute, etc.) and opcode handlers for each instruction.
 - Memory Management:
   Simulates the 64KB addressable memory space of the 6502, enabling realistic program execution.
 - Assembler:
@@ -16,7 +16,7 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
 - Debugger Integration:
   Includes a basic debugger to step through execution, inspect CPU state, and aid in development and troubleshooting.
 - Extensible Architecture:
-  The modular design makes it easy to add more instructions or enhance existing functionality.
+  The modular design makes it easy to add more instructions or enhance existing functionality. I'm planning on extending it to support basic graphics to render snake.
 
   
 ## Getting Started:
