@@ -1,11 +1,5 @@
-mod cpu;
-mod memory;
-mod op_code;
-
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     // -- LDA --
     #[test]
     fn test_lda_immediate() {

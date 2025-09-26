@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use crate::Memory;
+use crate::cpu::CPU;
 use crate::op_code::OpCodeHandler;
 use crate::op_code::OpcodeTable;
-use crate::cpu::CPU;
+use crate::Memory;
 
 // same as the CPU struct, just without opcodes. Used to save space on the stack. Min means minimal
 pub struct MinCPU {
@@ -16,8 +16,8 @@ pub struct MinCPU {
 }
 
 impl MinCPU {
-    pub fn new () -> Self {
-       MinCPU {
+    pub fn new() -> Self {
+        MinCPU {
             a: 0,
             x: 0,
             y: 0,
@@ -27,7 +27,7 @@ impl MinCPU {
         }
     }
 
-    pub fn copy_cpu (&mut self, cpu: &CPU) {
+    pub fn copy_cpu(&mut self, cpu: &CPU) {
         self.a = cpu.a;
         self.x = cpu.x;
         self.y = cpu.y;
@@ -41,50 +41,48 @@ pub struct CPUStack {
 }
 
 impl CPUStack {
-    pub fn new () -> Self {
+    pub fn new() -> Self {
         CPUStack {
             elements: Vec::new(),
         }
     }
 
-    pub fn pop (&mut self) -> Option<MinCPU> {
+    pub fn pop(&mut self) -> Option<MinCPU> {
         self.elements.pop()
     }
 
-    pub fn push (&mut self, x: MinCPU) {
-       self.elements.push(x);
+    pub fn push(&mut self, x: MinCPU) {
+        self.elements.push(x);
     }
 
-    pub fn peek (&self) -> Option<&MinCPU> {
+    pub fn peek(&self) -> Option<&MinCPU> {
         self.elements.last()
     }
 
-    pub fn size (self) -> usize {
+    pub fn size(self) -> usize {
         self.elements.len()
     }
 }
-
 
 pub struct Debugger {
     pub cpu_stack: CPUStack,
 }
 
-
 impl Debugger {
-    pub fn new () -> Self {
+    pub fn new() -> Self {
         Debugger {
             cpu_stack: CPUStack::new(),
         }
     }
 
-    pub fn print (self, temp: MinCPU) {
+    pub fn print(self, temp: MinCPU) {
         println!(
             "PC: {:#X} | A: {:#X}, X: {:#X}, Y: {:#X}, SP: {:#X}, Status: {:#b}",
             temp.pc, temp.a, temp.x, temp.y, temp.sp, temp.status
         );
     }
 
-    pub fn push (&mut self, cpu: &mut CPU) {
+    pub fn push(&mut self, cpu: &mut CPU) {
         let mut temp = MinCPU::new();
         temp.copy_cpu(&cpu);
         self.cpu_stack.push(temp);
