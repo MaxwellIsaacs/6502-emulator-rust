@@ -1,35 +1,20 @@
-//use crate::memory::Memory;
-//use crate::cpu::CPU;
-
 use std::collections::HashMap;
 use std::fs;
-//use std::io;
 use std::path::Path;
 
+pub fn assemble<P: AsRef<Path>>(file_path: P) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let path = file_path.as_ref();
 
-
-pub fn read_file (file_path: String) -> String {
-    let path = Path::new(&file_path);
-
-    if let Some(ext) = path.extension () {
-        if ext == "asm" {
-            println!("File is an ASM file");
-        } else {
-            panic!("File has wrong extension");
+    if let Some(ext) = path.extension() {
+        if ext != "asm" {
+            return Err(format!("File has wrong extension: {:?}", ext).into());
         }
     } else {
-        println!("File has no extension");
+        return Err("File has no extension".into());
     }
 
+    let contents = fs::read_to_string(path)?;
 
-    let contents = fs::read_to_string(path)
-        .expect("Should have read the file, it exists");
-
-    contents
-}
-
-
-pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let opcode_table: HashMap<&str, (u8, usize)> = [
         // Load and Store Instructions
         ("LDA", (0xA9, 1)), // Immediate
@@ -47,13 +32,11 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("LDY", (0xAC, 2)), // Absolute
         ("STY", (0x84, 1)), // Zero Page
         ("STY", (0x8C, 2)), // Absolute
-
         // Transfer Instructions
         ("TAX", (0xAA, 0)), // Transfer A to X
         ("TXA", (0x8A, 0)), // Transfer X to A
         ("TAY", (0xA8, 0)), // Transfer A to Y
         ("TYA", (0x98, 0)), // Transfer Y to A
-
         // Stack Instructions
         ("TSX", (0xBA, 0)), // Transfer Stack Pointer to X
         ("TXS", (0x9A, 0)), // Transfer X to Stack Pointer
@@ -61,7 +44,6 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("PLA", (0x68, 0)), // Pull A
         ("PHP", (0x08, 0)), // Push Processor Status
         ("PLP", (0x28, 0)), // Pull Processor Status
-
         // Arithmetic and Logic Instructions
         ("ADC", (0x69, 1)), // Immediate
         ("ADC", (0x65, 1)), // Zero Page
@@ -78,7 +60,6 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("CPY", (0xC0, 1)), // Immediate
         ("CPY", (0xC4, 1)), // Zero Page
         ("CPY", (0xCC, 2)), // Absolute
-
         // Increment and Decrement Instructions
         ("INC", (0xE6, 1)), // Zero Page
         ("INC", (0xEE, 2)), // Absolute
@@ -88,7 +69,6 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("DEC", (0xCE, 2)), // Absolute
         ("DEX", (0xCA, 0)), // Decrement X
         ("DEY", (0x88, 0)), // Decrement Y
-
         // Shift and Rotate Instructions
         ("ASL", (0x0A, 0)), // Accumulator
         ("ASL", (0x06, 1)), // Zero Page
@@ -102,7 +82,6 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("ROR", (0x6A, 0)), // Accumulator
         ("ROR", (0x66, 1)), // Zero Page
         ("ROR", (0x6E, 2)), // Absolute
-
         // Jump and Branch Instructions
         ("JMP", (0x4C, 2)), // Absolute
         ("JMP", (0x6C, 2)), // Indirect
@@ -117,7 +96,6 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("BPL", (0x10, 1)), // Branch if Plus
         ("BVC", (0x50, 1)), // Branch if Overflow Clear
         ("BVS", (0x70, 1)), // Branch if Overflow Set
-
         // Flag Instructions
         ("CLC", (0x18, 0)), // Clear Carry
         ("SEC", (0x38, 0)), // Set Carry
@@ -126,13 +104,14 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
         ("CLV", (0xB8, 0)), // Clear Overflow
         ("CLD", (0xD8, 0)), // Clear Decimal
         ("SED", (0xF8, 0)), // Set Decimal
-
         // No Operation
         ("NOP", (0xEA, 0)), // No operation
-    ].iter().cloned().collect();
+    ]
+    .iter()
+    .cloned()
+    .collect();
 
     let mut program = Vec::new();
-    let contents = read_file(file_path);
 
     for line in contents.lines() {
         // Remove comments and trim whitespace
@@ -160,7 +139,7 @@ pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>
                     // Push the operand bytes (little-endian for 16-bit)
                     if operand_size == 2 {
                         program.push((value & 0xFF) as u8); // Low byte
-                        program.push((value >> 8) as u8);  // High byte
+                        program.push((value >> 8) as u8); // High byte
                     } else {
                         program.push(value as u8); // Single byte
                     }

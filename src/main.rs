@@ -1,36 +1,8 @@
-mod cpu;
-mod memory;
-mod op_code;
-mod debugger;
-mod loader;
-
-use crate::memory::Memory;
-use crate::cpu::CPU;
-use crate::debugger::Debugger;
-use loader::assemble;
+use std::env;
 use std::io::{self, Write};
+use std::path::Path;
 
-fn load_program(cpu: &mut CPU, memory: &mut Memory) {
-    let program: Result<Vec<u8>, Box<dyn std::error::Error>> = assemble (String::from("/Users/maxwellisaacs/Dropbox/dev/arch_dev/rust/rust_6502_emulator/src/example.asm"));
-
-    let program = match program {
-        Ok(program) => program,
-        Err(e) => {
-            eprintln!("failed to parse program {}", e);
-            return;
-        }
-    };
-
-    let start_addr = 0x0600;
-    for (i, &byte) in program.iter().enumerate() {
-        memory.write(start_addr + i as u16, byte);
-    }
-
-    cpu.pc = start_addr;
-
-}
-
-
+use rust_6502_emulator::{load_program, Debugger, Memory, ProgramSource, CPU};
 
 fn run_step_mode(cpu: &mut CPU, memory: &mut Memory) {
     loop {
@@ -49,7 +21,9 @@ fn run_step_mode(cpu: &mut CPU, memory: &mut Memory) {
         io::stdout().flush().unwrap();
 
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
         let input = input.trim();
 
         if input == "n" {
@@ -81,8 +55,7 @@ fn run_step_mode(cpu: &mut CPU, memory: &mut Memory) {
     }
 }
 
-
-fn run_program(cpu: &mut CPU, memory: &mut Memory, debugger: &mut Debugger) {
+fn run_program(cpu: &mut CPU, memory: &mut Memory, _debugger: &mut Debugger) {
     println!("Starting program execution...\n");
 
     loop {
@@ -102,6 +75,15 @@ fn main() {
     let mut debugger: Debugger = Debugger::new();
 
     cpu.reset();
-    load_program(&mut cpu, &mut memory);
+
+    let args: Vec<String> = env::args().collect();
+    let program_arg = args.get(1).map(String::as_str).unwrap_or("src/example.asm");
+    let program_path = Path::new(program_arg);
+
+    if let Err(e) = load_program(&mut cpu, &mut memory, ProgramSource::Path(program_path)) {
+        eprintln!("failed to load program {}", e);
+        return;
+    }
+
     run_program(&mut cpu, &mut memory, &mut debugger);
 }
