@@ -17,6 +17,10 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
   Includes a basic debugger to step through execution, inspect CPU state, and aid in development and troubleshooting.
 - Extensible Architecture:
   The modular design makes it easy to add more instructions or enhance existing functionality. I'm planning on extending it to support basic graphics to render snake.
+- Library Facade:
+  Provides an `Emulator` type that wraps the CPU and memory, making it simple to reset state, load programs, run for a fixed number of cycles, or execute until a BRK instruction.
+- WebAssembly Bindings:
+  Optional `wasm-bindgen` exports enable running the emulator in the browser while sharing memory buffers with JavaScript.
 
   
 ## Getting Started:
@@ -25,14 +29,20 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
    cd 6502-emulator-rust
 
 2. Build the Project:
-   cargo build --release
+   ```bash
+   cargo build
+   ```
 
 3. Running the Emulator:
-   To run the emulator with a binary program, either paste your file into example.asm, or change the path in the `main.rs` file
+   The interactive debugger is hidden behind the `debugger` feature flag. Enable it when running the binary and pass the path to the assembly program you want to assemble and execute:
+   ```bash
+   cargo run --features debugger -- path/to/program.asm
+   ```
+   If no path is provided, the CLI falls back to `src/example.asm`.
 
 ## Implementation Overview:
 - CPU and Opcode Table:
-  The CPU struct holds registers (a, x, y, sp, pc, and status) and a Debugger instance. It provides methods to execute instructions, set and clear flags, and update the program counter.
+  The CPU struct holds registers (a, x, y, sp, pc, and status) and provides methods to execute instructions, set and clear flags, and update the program counter. When the `debugger` feature is enabled, additional debugging helpers are compiled in.
   An OpcodeTable maps opcodes (like LDA, STA, TAX, etc.) to their corresponding handler functions. The handlers are implemented as functions that may or may not require access to memory.
 
 - Memory Management:
@@ -43,10 +53,35 @@ This project is a 6502 microprocessor emulator written in Rust. The emulator rep
   It supports various operand sizes (1 or 2 bytes) and handles little-endian conversion for 16-bit values.
 
 ## Debugging and Testing:
-The project integrates a debugger (accessible via the Debugger struct) which allows you to:
+The project integrates a debugger (enabled through the `debugger` feature) which allows you to:
 - Step through instruction execution.
 - Inspect CPU registers and memory.
 - Monitor the state of the program counter and flags.
+
+## Library Usage
+
+The `Emulator` type exposed by the crate can be embedded in other applications:
+
+```rust
+use rust_6502_emulator::Emulator;
+
+let mut emulator = Emulator::new();
+emulator.reset();
+emulator.load_program(&program_bytes);
+emulator.tick(10); // execute ten instructions
+let state = emulator.state();
+println!("PC={:#06X}", state.pc);
+```
+
+## WebAssembly Build
+
+Enable the `wasm` feature and use `wasm-pack` to build the bindings exposed through `wasm-bindgen`:
+
+```bash
+wasm-pack build --target web --features wasm
+```
+
+The generated `WasmEmulator` class mirrors the native facade: it exposes `reset`, `load_program`, `tick`, `run_until_break`, and helpers to inspect registers or map the 64KB memory buffer into JavaScript via the returned pointer and length.
 
 ## 6502 Opcode Checklist
 
