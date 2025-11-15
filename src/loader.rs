@@ -119,9 +119,7 @@ pub fn read_file(file_path: String) -> String {
         println!("File has no extension");
     }
 
-    let contents = fs::read_to_string(path).expect("Should have read the file, it exists");
-
-    contents
+    fs::read_to_string(path).expect("Should have read the file, it exists")
 }
 
 pub fn assemble(file_path: String) -> Result<Vec<u8>, Box<dyn std::error::Error>> {

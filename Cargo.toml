@@ -2,5 +2,11 @@
 name = "rust_6502_emulator"
 version = "0.1.0"
 edition = "2021"
+authors = ["Maxwell Isaacs"]
+description = "A 6502 microprocessor emulator written in Rust with assembler support"
+license = "MIT"
+repository = "https://github.com/MaxwellIsaacs/6502-emulator-rust"
+keywords = ["6502", "emulator", "assembler", "cpu"]
+categories = ["emulators", "command-line-utilities"]
 
 [dependencies]

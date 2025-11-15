@@ -7,28 +7,11 @@ use crate::{CPU, Memory};
 
 type OpCodeHandlerWithMem = fn(&mut CPU, &mut Memory);
 type OpCodeHandlerNoMem = fn(&mut CPU);
-type OpCodeHandlerWithAddr = fn(&mut CPU, &mut Memory, u8);
 
 #[derive(Clone)]
 pub enum OpCodeHandler {
     WithMem(OpCodeHandlerWithMem),
     NoMem(OpCodeHandlerNoMem),
-    // WithAddr(OpCodeHandlerWithAddr)
-}
-
-#[derive(Debug)]
-#[allow(non_camel_case_types)]
-pub enum AddressingMode {
-    Immediate,
-    ZeroPage,
-    ZeroPage_X,
-    ZeroPage_Y,
-    Absolute,
-    Absolute_X,
-    Absolute_Y,
-    Indirect_X,
-    Indirect_Y,
-    Implied,
 }
 
 pub const OPCODE_DEFINITIONS: [(u8, OpCodeHandler); 64] = [
@@ -115,23 +98,9 @@ pub const OPCODE_DEFINITIONS: [(u8, OpCodeHandler); 64] = [
     (0x40, OpCodeHandler::WithMem(CPU::rti)), // RTI - Return from Interrupt
     // -- ADC (Add with Carry) --
     (0x69, OpCodeHandler::WithMem(CPU::adc)), // Immediate
-// (0x65, OpCodeHandler::WithMem(CPU::adc)), // Zero Page
-// (0x75, OpCodeHandler::WithMem(CPU::adc)), // Zero Page,X
-// (0x6D, OpCodeHandler::WithMem(CPU::adc)), // Absolute
-// (0x7D, OpCodeHandler::WithMem(CPU::adc)), // Absolute,X
-// (0x79, OpCodeHandler::WithMem(CPU::adc)), // Absolute,Y
-// (0x61, OpCodeHandler::WithMem(CPU::adc)), // (Indirect,X)
-// (0x71, OpCodeHandler::WithMem(CPU::adc)), // (Indirect),Y
 
-// -- SBC (Subtract with Carry) --
+    // -- SBC (Subtract with Carry) --
     (0xE9, OpCodeHandler::WithMem(CPU::sbc)), // Immediate
-    //(0xE5, OpCodeHandler::WithMem(CPU::sbc)), // // Zero Page
-    // (0xF5, OpCodeHandler::WithMem(CPU::sbc)), // Zero Page,X
-    // (0xED, OpCodeHandler::WithMem(CPU::sbc)), // Absolute
-    // (0xFD, OpCodeHandler::WithMem(CPU::sbc)), // Absolute,X
-    // (0xF9, OpCodeHandler::WithMem(CPU::sbc)), // Absolute,Y
-    // (0xE1, OpCodeHandler::WithMem(CPU::sbc)), // (Indirect,X)
-    // (0xF1, OpCodeHandler::WithMem(CPU::sbc)), // (Indirect),
 ];
 
 #[derive(Clone, Default)]
@@ -153,5 +122,11 @@ impl OpcodeTable {
             };
         }
         OpcodeTable { table }
+    }
+}
+
+impl Default for OpcodeTable {
+    fn default() -> Self {
+        Self::new()
     }
 }

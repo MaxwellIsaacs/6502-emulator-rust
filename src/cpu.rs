@@ -1,7 +1,6 @@
 use crate::Memory;
 use crate::op_code::OpCodeHandler;
 use crate::op_code::OpcodeTable;
-use crate::debugger::Debugger;
 
 
 pub struct CPU {
@@ -11,7 +10,6 @@ pub struct CPU {
     pub sp: u8,
     pub pc: u16,
     pub status: u8,
-    pub debugger: Debugger,
     opcode_table: OpcodeTable,
 }
 
@@ -26,7 +24,7 @@ pub const CARRY_FLAG: u8 = 0b0000_0001;    // Bit 0
 
 // set and clear status flags
 impl CPU {
-    pub fn set_flag (&mut self, flag: u8, value: bool) {
+    pub fn set_flag(&mut self, flag: u8, value: bool) {
         match flag {
             NEGATIVE_FLAG => {
                 if value {
@@ -78,27 +76,26 @@ impl CPU {
                 }
             }
             _ => {
-                panic!("Unknown fag: {:#X}", flag);
+                panic!("Unknown flag: {:#X}", flag);
             }
         }
     }
 
-    pub fn clear_flag (&mut self, flag: u8) {
+    pub fn clear_flag(&mut self, flag: u8) {
         self.set_flag (flag, false);
     }
 }
-/*
-impl CPU {
-    pub fn get_operand_addr (&mut self, )
-}
-
-*/
 
 // constructor for cpu
+impl Default for CPU {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CPU {
-    pub fn new () -> Self {
+    pub fn new() -> Self {
         let opcode_table: OpcodeTable = OpcodeTable::new ();
-        let debugger: Debugger = Debugger::new();
         CPU {
             a: 0,
             x: 0,
@@ -106,12 +103,11 @@ impl CPU {
             sp: 0xff,
             pc: 0x0000,
             status: 0,
-            debugger,
             opcode_table,
         }
     }
 
-    pub fn reset (&mut self) {
+    pub fn reset(&mut self) {
         self.a = 0;
         self.x = 0;
         self.y = 0;
@@ -149,7 +145,7 @@ impl CPU {
 
 impl CPU {
 
-    fn set_ld_flags (&mut self, reg: u8) {
+    fn set_ld_flags(&mut self, reg: u8) {
         self.set_flag(ZERO_FLAG, reg == 0);
         self.set_flag(NEGATIVE_FLAG, (reg & 0b1000_0000) != 0);
     }
@@ -369,7 +365,7 @@ impl CPU {
 */
 
 impl CPU {
-    pub fn jmp_absolute (&mut self, memory: &mut Memory) {
+    pub fn jmp_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
 
@@ -377,13 +373,13 @@ impl CPU {
         self.pc = addr;
     }
 
-    pub fn jmp_indirect (&mut self, memory: &mut Memory) {
+    pub fn jmp_indirect(&mut self, memory: &mut Memory) {
         let pointer_hi = memory.read (self.pc + 1);
         let pointer_lo = memory.read (self.pc + 2);
         let pointer = ((pointer_hi as u16) << 8) | pointer_lo as u16;
 
         let target_hi = memory.read (pointer);
-        let target_lo = memory.read ((pointer & 0xFF00) | (pointer + 1 & 0x00FF));
+        let target_lo = memory.read ((pointer & 0xFF00) | ((pointer + 1) & 0x00FF));
         let target = ((target_hi as u16) << 8) | target_lo as u16;
 
         self.pc = target;
@@ -405,7 +401,7 @@ impl CPU {
         self.pc = target;
     }
 
-    pub fn bcs (&mut self, memory: &mut Memory) {
+    pub fn bcs(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
         if self.status & 0b0000_0001 != 0 {
@@ -416,7 +412,7 @@ impl CPU {
         }
     }
 
-    pub fn bcc (&mut self, memory: &mut Memory) {
+    pub fn bcc(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
         if self.status & 0b0000_0001 == 0 {
@@ -427,10 +423,10 @@ impl CPU {
         }
     }
 
-    pub fn beq (&mut self, memory: &mut Memory) {
+    pub fn beq(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
-        if self.status & 0b0000_0010 == 1 {
+        if self.status & 0b0000_0010 != 0 {
             let new_pc = (self.pc as i16) + (value as i16);
             self.pc = new_pc as u16;
         } else {
@@ -438,10 +434,10 @@ impl CPU {
         }
     }
 
-    pub fn bmi (&mut self, memory: &mut Memory) {
+    pub fn bmi(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
-        if self.status & 0b1000_0000 == 1 {
+        if self.status & 0b1000_0000 != 0 {
             let new_pc = (self.pc as i16) + (value as i16);
             self.pc = new_pc as u16;
         } else {
@@ -449,7 +445,7 @@ impl CPU {
         }
     }
 
-    pub fn bne (&mut self, memory: &mut Memory) {
+    pub fn bne(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
         if self.status & 0b0000_0010 == 0 {
@@ -460,7 +456,7 @@ impl CPU {
         }
     }
 
-    pub fn bpl (&mut self, memory: &mut Memory) {
+    pub fn bpl(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
         if self.status & 0b1000_0000 == 0 {
@@ -471,7 +467,7 @@ impl CPU {
         }
     }
 
-    pub fn bvc (&mut self, memory: &mut Memory) {
+    pub fn bvc(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
         if self.status & 0b0100_0000 == 0 {
@@ -482,10 +478,10 @@ impl CPU {
         }
     }
 
-    pub fn bvs (&mut self, memory: &mut Memory) {
+    pub fn bvs(&mut self, memory: &mut Memory) {
         let value: i8 = memory.read(self.pc + 1) as i8;
 
-        if self.status & 0b0100_0000 == 1 {
+        if self.status & 0b0100_0000 != 0 {
             let new_pc = (self.pc as i16) + (value as i16);
             self.pc = new_pc as u16;
         } else {
@@ -496,7 +492,7 @@ impl CPU {
 
 
 impl CPU {
-    pub fn cmp_zero_page (&mut self, memory: &mut Memory) {
+    pub fn cmp_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr) as u16;
         let result = self.a.wrapping_sub(value as u8);
@@ -504,10 +500,10 @@ impl CPU {
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);   // Negative flag if result is negative
         self.set_flag(CARRY_FLAG, (self.a as u16) >= value);           // Carry flag if A >= value
 
-        self.pc += 3;
+        self.pc += 2;
    }
 
-    pub fn cmp_immediate (&mut self, memory: &mut Memory) {
+    pub fn cmp_immediate(&mut self, memory: &mut Memory) {
         let value = memory.read(self.pc + 1) as u16;
         let result = self.a.wrapping_sub(value as u8);
 
@@ -515,11 +511,11 @@ impl CPU {
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);   // Negative flag if result is negative
         self.set_flag(CARRY_FLAG, (self.a as u16) >= value);           // Carry flag if A >= value
 
-        self.pc += 3;
+        self.pc += 2;
    }
 
 
-    pub fn cmp_absolute (&mut self, memory: &mut Memory) {
+    pub fn cmp_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
@@ -533,7 +529,7 @@ impl CPU {
         self.pc += 3;
    }
 
-    pub fn cpy_zero_page (&mut self, memory: &mut Memory) {
+    pub fn cpy_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
         let result = self.y.wrapping_sub(value);
@@ -545,7 +541,7 @@ impl CPU {
         self.pc += 3;
     }
 
-    pub fn cpy_immediate (&mut self, memory: &mut Memory) {
+    pub fn cpy_immediate(&mut self, memory: &mut Memory) {
         let value = memory.read(self.pc + 1);
         let result = self.y.wrapping_sub(value);
 
@@ -557,7 +553,7 @@ impl CPU {
     }
 
 
-    pub fn cpy_absolute (&mut self, memory: &mut Memory) {
+    pub fn cpy_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
@@ -566,18 +562,18 @@ impl CPU {
 
         self.set_flag(ZERO_FLAG, result == 0);                // Zero flag if A == value
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);   // Negative flag if result is negative
-        self.set_flag(CARRY_FLAG, (self.y as u16) >= value as u16); // Set carry flag if Y >= value
+        self.set_flag(CARRY_FLAG, (self.y as u16) >= value); // Set carry flag if Y >= value
 
         self.pc += 3;
     }
 
 
-    pub fn cpx_zero_page (&mut self, memory: &mut Memory) {
+    pub fn cpx_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
 
 
-        let result = self.x.wrapping_sub(value as u8);
+        let result = self.x.wrapping_sub(value);
 
         self.set_flag(ZERO_FLAG, result == 0);                // Zero flag if A == value
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);   // Negative flag if result is negative
@@ -586,10 +582,10 @@ impl CPU {
         self.pc += 2;
     }
 
-    pub fn cpx_immediate (&mut self, memory: &mut Memory) {
+    pub fn cpx_immediate(&mut self, memory: &mut Memory) {
         let value = memory.read(self.pc + 1);
 
-        let result = self.x.wrapping_sub(value as u8);
+        let result = self.x.wrapping_sub(value);
 
         self.set_flag(ZERO_FLAG, result == 0);                // Zero flag if A == value
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);   // Negative flag if result is negative
@@ -600,7 +596,7 @@ impl CPU {
     }
 
 
-    pub fn cpx_absolute (&mut self, memory: &mut Memory) {
+    pub fn cpx_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
@@ -609,7 +605,7 @@ impl CPU {
 
         self.set_flag(ZERO_FLAG, result == 0);                // Zero flag if A == value
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);   // Negative flag if result is negative
-        self.set_flag(CARRY_FLAG, (self.x as u16) >= value as u16); // Set carry flag if Y >= value
+        self.set_flag(CARRY_FLAG, (self.x as u16) >= value); // Set carry flag if Y >= value
 
         self.pc += 3;
     }
@@ -619,16 +615,16 @@ impl CPU {
 // <CLC, CLD, CLI, CLV>
 
 impl CPU {
-   pub fn clc (&mut self) {
+   pub fn clc(&mut self) {
        self.clear_flag(CARRY_FLAG);
    }
-    pub fn cld (&mut self) {
+    pub fn cld(&mut self) {
        self.clear_flag(DECIMAL_FLAG);
    }
-    pub fn cli (&mut self) {
+    pub fn cli(&mut self) {
        self.clear_flag(INTERRUPT_FLAG);
    }
-    pub fn cly (&mut self) {
+    pub fn cly(&mut self) {
        self.clear_flag(OVERFLOW_FLAG);
    }
 }
@@ -639,124 +635,124 @@ impl CPU {
 
     // and
 
-    pub fn and_immediate (&mut self, memory: &mut Memory) {
+    pub fn and_immediate(&mut self, memory: &mut Memory) {
         let value = memory.read(self.pc+1);
-        self.a = self.a & value;
+        self.a &= value;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 2;
     }
 
-    pub fn and_zero_page (&mut self, memory: &mut Memory) {
+    pub fn and_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
-        self.a = self.a & value;
+        self.a &= value;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 2;
     }
 
-    pub fn and_absolute (&mut self, memory: &mut Memory) {
+    pub fn and_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
 
-        self.a = self.a & (value as u8);
+        self.a &= value as u8;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 3;
     }
 
     // ora
 
-    pub fn ora_immediate (&mut self, memory: &mut Memory) {
+    pub fn ora_immediate(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
-        self.a = self.a & value;
+        self.a |= value;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 2;
     }
 
-    pub fn ora_zero_page (&mut self, memory: &mut Memory) {
+    pub fn ora_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
-        self.a = self.a & value;
+        self.a |= value;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 2;
      }
 
-    pub fn ora_absolute (&mut self, memory: &mut Memory) {
+    pub fn ora_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
 
-        self.a = self.a | (value as u8);
+        self.a |= value as u8;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 3;
     }
 
     // eor
 
-    pub fn eor_immediate (&mut self, memory: &mut Memory) {
+    pub fn eor_immediate(&mut self, memory: &mut Memory) {
         let value = memory.read(self.pc+1);
-        self.a = self.a ^ value;
+        self.a ^= value;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 2;
     }
 
-    pub fn eor_zero_page (&mut self, memory: &mut Memory) {
+    pub fn eor_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
-        self.a = self.a ^ value;
+        self.a ^= value;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 2;
     }
 
-    pub fn eor_absolute (&mut self, memory: &mut Memory) {
+    pub fn eor_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
 
-        self.a = self.a ^ (value as u8);
+        self.a ^= value as u8;
 
         self.set_flag (ZERO_FLAG, value == 0);
-        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (self.a & 0b1000_0000) != 0);
         self.pc += 3;
      }
 
     // bit
 
-    pub fn bit_zero_page (&mut self, memory: &mut Memory) {
+    pub fn bit_zero_page(&mut self, memory: &mut Memory) {
         let addr = memory.read(self.pc + 1) as u16;
         let value = memory.read(addr);
 
-        self.set_flag (ZERO_FLAG, value as u8 & self.a == 0);
-        self.set_flag (NEGATIVE_FLAG, value & 0b1000_000 != 0);
+        self.set_flag (ZERO_FLAG, value & self.a == 0);
+        self.set_flag (NEGATIVE_FLAG, value & 0b1000_0000 != 0);
         self.set_flag(OVERFLOW_FLAG, value & 0b0100_0000 != 0);
 
         self.pc += 2;
     }
 
-    pub fn bit_absolute (&mut self, memory: &mut Memory) {
+    pub fn bit_absolute(&mut self, memory: &mut Memory) {
         let lo = memory.read(self.pc + 1);
         let hi = memory.read(self.pc + 2);
         let value = ((hi as u16) << 8) | lo as u16;
 
         self.set_flag (ZERO_FLAG, (value as u8 & self.a) == 0);
-        self.set_flag (NEGATIVE_FLAG, (value as u8 & 0b1000_000) != 0);
+        self.set_flag (NEGATIVE_FLAG, (value as u8 & 0b1000_0000) != 0);
         self.set_flag(OVERFLOW_FLAG, (value as u8) & 0b0100_0000 != 0);
 
         self.pc += 3;
@@ -771,29 +767,29 @@ impl CPU {
     const START_STACK: u16 = 0b0000_0001_0000_0000;  // 256 in decimal
 //    const END_STACK: u16 = 0b0000_0001_1111_1111;  // 511 in decimal
 
-    fn push (&mut self, memory: &mut Memory, value: u8) {
+    fn push(&mut self, memory: &mut Memory, value: u8) {
         memory.write(Self::START_STACK + self.sp as u16, value);
         self.sp -= 1;
     }
 
-    fn pop (&mut self, memory: &mut Memory) -> u8 {
+    fn pop(&mut self, memory: &mut Memory) -> u8 {
         self.sp += 1;
-        memory.read(Self::START_STACK + self.sp as u16 + 1)
+        memory.read(Self::START_STACK + self.sp as u16)
     }
 
-    pub fn php (&mut self, memory: &mut Memory) {
+    pub fn php(&mut self, memory: &mut Memory) {
         self.push (memory, self.status);
     }
 
-    pub fn plp (&mut self, memory: &mut Memory) {
+    pub fn plp(&mut self, memory: &mut Memory) {
         self.status = self.pop(memory);
     }
 
-    pub fn pha (&mut self, memory: &mut Memory) {
+    pub fn pha(&mut self, memory: &mut Memory) {
         self.push (memory, self.a);
     }
 
-    pub fn pla (&mut self, memory: &mut Memory) {
+    pub fn pla(&mut self, memory: &mut Memory) {
         self.a = self.pop(memory);
     }
 
@@ -815,25 +811,25 @@ impl CPU {
 // < ADC, SBC,
 
 impl CPU {
-    pub fn adc (&mut self, memory: &mut Memory)  {
+    pub fn adc(&mut self, memory: &mut Memory)  {
         let value = memory.read (self.pc) as u16;
         let carry: u16 = if (self.status & CARRY_FLAG) != 0 {1} else {0} ;
         let result = (value + carry) as u8;
         self.a = result;
         self.set_flag(ZERO_FLAG, result == 0);
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);
-        let overflow = (!((self.a as u16) ^ (value as u16)) & ((self.a as u16) ^ result as u16) & 0x80) != 0;
+        let overflow = (!((self.a as u16) ^ value) & ((self.a as u16) ^ result as u16) & 0x80) != 0;
         self.set_flag(OVERFLOW_FLAG, overflow);
     }
 
-    pub fn sbc (&mut self, memory: &mut Memory)  {
+    pub fn sbc(&mut self, memory: &mut Memory)  {
         let value = memory.read (self.pc) as u16;
         let carry: u16 = if (self.status & CARRY_FLAG) != 0 {1} else {0} ;
         let result = (value - (1 - carry)) as u8;
         self.a = result;
         self.set_flag(ZERO_FLAG, result == 0);
         self.set_flag(NEGATIVE_FLAG, (result & 0x80) != 0);
-        let overflow = (!((self.a as u16) ^ (value as u16)) & ((self.a as u16) ^ result as u16) & 0x80) != 0;
+        let overflow = (!((self.a as u16) ^ value) & ((self.a as u16) ^ result as u16) & 0x80) != 0;
         self.set_flag(OVERFLOW_FLAG, overflow);
     }
 }

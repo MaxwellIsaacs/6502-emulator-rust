@@ -6,12 +6,11 @@ mod loader;
 
 use crate::memory::Memory;
 use crate::cpu::CPU;
-use crate::debugger::Debugger;
 use loader::assemble;
 use std::io::{self, Write};
 
 fn load_program(cpu: &mut CPU, memory: &mut Memory) {
-    let program: Result<Vec<u8>, Box<dyn std::error::Error>> = assemble (String::from("/Users/maxwellisaacs/Dropbox/dev/arch_dev/rust/rust_6502_emulator/src/example.asm"));
+    let program: Result<Vec<u8>, Box<dyn std::error::Error>> = assemble (String::from("src/example.asm"));
 
     let program = match program {
         Ok(program) => program,
@@ -82,7 +81,7 @@ fn run_step_mode(cpu: &mut CPU, memory: &mut Memory) {
 }
 
 
-fn run_program(cpu: &mut CPU, memory: &mut Memory, debugger: &mut Debugger) {
+fn run_program(cpu: &mut CPU, memory: &mut Memory) {
     println!("Starting program execution...\n");
 
     loop {
@@ -99,9 +98,8 @@ fn run_program(cpu: &mut CPU, memory: &mut Memory, debugger: &mut Debugger) {
 fn main() {
     let mut cpu: CPU = CPU::new();
     let mut memory: Memory = Memory::new();
-    let mut debugger: Debugger = Debugger::new();
 
     cpu.reset();
     load_program(&mut cpu, &mut memory);
-    run_program(&mut cpu, &mut memory, &mut debugger);
+    run_program(&mut cpu, &mut memory);
 }
